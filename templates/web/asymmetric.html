@@ -1,0 +1,90 @@
+{% extends "web/base.html" %}
+
+{% block content %}
+    <h1>RSA</h1>
+    <form>
+        <div class="form-group">
+            <label for="textInput">Введите текст</label>
+            <textarea class="form-control" id="textInput" rows="5"></textarea>
+        </div>
+        <div class="form-group">
+            <label for="textOutput">Результат</label>
+            <textarea class="form-control" id="textOutput" rows="5"></textarea>
+        </div>
+        <div class="from-group">
+            <button type="button" class="btn btn-primary" id="encode">Кодировать</button>
+            <button type="button" class="btn btn-primary" id="decode">Декодировать</button>
+        </div>
+    </form>
+    <h1>Ключи</h1>
+    <form>
+        <div class="form-group">
+            <label for="publicKey">Открытый ключ</label>
+            <textarea class="form-control" id="publicKey" rows="3"></textarea>
+        </div>
+        <div class="form-group">
+            <label for="privateKey">Закрытый ключ</label>
+            <textarea class="form-control" id="privateKey" rows="3"></textarea>
+        </div>
+        <div class="from-group">
+            <button type="button" class="btn btn-primary" id="generateKey">Генерировать ключ</button>
+        </div>
+    </form>
+{% endblock content %}
+
+{% block botton %}
+    <script>
+        let btnGenerateKey = document.getElementById('generateKey');
+        let btnEncode = document.getElementById('encode');
+        let btnDecode = document.getElementById('decode');
+        let textPublicKey = document.getElementById('publicKey');
+        let textPrivateKey = document.getElementById('privateKey');
+        let textInput = document.getElementById('textInput');
+        let textOutput = document.getElementById('textOutput');
+
+        btnGenerateKey.addEventListener('click', () => {
+            let xhr = new XMLHttpRequest();
+            xhr.open('GET', '/api/rsa_generate_key', true);
+            xhr.onreadystatechange = function () {
+                if (this.status !== 200) return;
+
+                let result = JSON.parse(xhr.responseText);
+                textPublicKey.value = result.public_key;
+                textPrivateKey.value = result.private_key;
+            };
+            xhr.send();
+        });
+
+        btnEncode.addEventListener('click', () => {
+            let xhr = new XMLHttpRequest();
+            xhr.open('POST', '/api/rsa_encode', true);
+            xhr.onreadystatechange = function () {
+                if (this.status !== 200) return;
+
+                let result = JSON.parse(xhr.responseText);
+                textOutput.value = result.result;
+            };
+
+            let data = new FormData();
+            data.append('text', textInput.value);
+            data.append('public_key', textPublicKey.value);
+            xhr.send(data);
+        });
+
+        btnDecode.addEventListener('click', () => {
+            let xhr = new XMLHttpRequest();
+            xhr.open('POST', '/api/rsa_decode', true);
+            xhr.onreadystatechange = function () {
+                if (this.status !== 200) return;
+
+                let result = JSON.parse(xhr.responseText);
+                textOutput.value = result.result;
+            };
+
+            let data = new FormData();
+            data.append('text', textInput.value);
+            data.append('private_key', textPrivateKey.value);
+            xhr.send(data);
+        });
+    </script>
+{% endblock botton %}

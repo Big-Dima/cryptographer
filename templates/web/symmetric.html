@@ -1,0 +1,63 @@
+{% extends "web/base.html" %}
+
+{% block content %}
+    <h1>Симметричное шифрование DES</h1>
+    <form>
+        <div class="form-group">
+            <label for="textInput">Введите текст</label>
+            <textarea class="form-control" id="textInput" rows="5"></textarea>
+        </div>
+        <div class="form-group">
+            <label for="textOutput">Результат</label>
+            <textarea class="form-control" id="textOutput" rows="5"></textarea>
+        </div>
+        <div class="form-group">
+            <label for="key">Ключ (8 символов)</label>
+            <input type="text" class="form-control" id="key"/>
+        </div>
+        <div class="from-group">
+            <button type="button" class="btn btn-primary" id="encode">Кодировать</button>
+            <button type="button" class="btn btn-primary" id="decode">Декодировать</button>
+        </div>
+    </form>
+{% endblock content %}
+
+{% block botton %}
+    <script>
+        let btnEncode = document.getElementById('encode');
+        let btnDecode = document.getElementById('decode');
+        let key = document.getElementById('key');
+        let textInput = document.getElementById('textInput');
+        let textOutput = document.getElementById('textOutput');
+
+        btnEncode.addEventListener('click', () => {
+            let xhr = new XMLHttpRequest();
+            xhr.open('POST', '/api/des_encode', true);
+            xhr.onreadystatechange = function () {
+                if (this.status !== 200) return;
+
+                textOutput.value = JSON.parse(xhr.responseText).result;
+            };
+
+            let data = new FormData();
+            data.append('text', textInput.value);
+            data.append('key', key.value);
+            xhr.send(data);
+        });
+
+        btnDecode.addEventListener('click', () => {
+            let xhr = new XMLHttpRequest();
+            xhr.open('POST', '/api/des_decode', true);
+            xhr.onreadystatechange = function () {
+                if (this.status !== 200) return;
+
+                textOutput.value = JSON.parse(xhr.responseText).result;
+            };
+
+            let data = new FormData();
+            data.append('text', textInput.value);
+            data.append('key', key.value);
+            xhr.send(data);
+        });
+    </script>
+{% endblock botton %}

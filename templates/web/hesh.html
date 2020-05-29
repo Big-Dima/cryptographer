@@ -1,0 +1,97 @@
+{% extends "web/base.html" %}
+
+{% block content %}
+    <h1>Вычисление хэш сумм</h1>
+    <form>
+        <div class="form-group form-check-inline">
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="hesh" id="md5" value="md5"
+                       checked>
+                <label class="form-check-label" for="md5">
+                    md5
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="hesh" id="sha1" value="sha1">
+                <label class="form-check-label" for="sha1">
+                    sha1
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="hesh" id="sha224" value="sha224">
+                <label class="form-check-label" for="sha224">
+                    sha224
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="hesh" id="sha256" value="sha256">
+                <label class="form-check-label" for="sha256">
+                    sha256
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="hesh" id="sha384" value="sha384">
+                <label class="form-check-label" for="sha384">
+                    sha384
+                </label>
+            </div>
+            <div class="form-check disabled">
+                <input class="form-check-input" type="radio" name="hesh" id="sha512" value="sha512">
+                <label class="form-check-label" for="sha512">
+                    sha512
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="textInput">Введите текст</label>
+            <textarea class="form-control" id="textInput" rows="8"></textarea>
+        </div>
+        <div class="form-group">
+            <label for="textOutput">Хэш сумма веденого текста</label>
+            <textarea class="form-control" id="textOutput" rows="3" disabled></textarea>
+        </div>
+        <div class="form-group">
+            <label for="textCheck">Хэш сумма для проверки</label>
+            <textarea class="form-control" id="textCheck" rows="3"></textarea>
+        </div>
+        <div class="from-group">
+            <button type="button" class="btn btn-primary" id="calculateHash">Вычислить хэш</button>
+            <button type="button" class="btn btn-primary" id="diffHash">Сравнить хэш</button>
+        </div>
+    </form>
+{% endblock content %}
+
+{% block botton %}
+    <script>
+        let btnCalculateHash = document.getElementById('calculateHash');
+        let btnDiffHash = document.getElementById('diffHash');
+        let textInput = document.getElementById('textInput');
+        let textOutput = document.getElementById('textOutput');
+        let textCheck = document.getElementById('textCheck');
+
+        btnCalculateHash.addEventListener('click', () => {
+            let method = document.querySelector('input[name="hesh"]:checked').value;
+
+            let xhr = new XMLHttpRequest();
+            xhr.open('GET', `/api/${method}?text=${textInput.value}`, true);
+            xhr.send();
+            xhr.onreadystatechange = function () {
+                if (this.status !== 200) return;
+
+                textOutput.value = JSON.parse(xhr.responseText).result;
+            };
+        });
+
+        btnDiffHash.addEventListener('click', () => {
+            if (textOutput.value === textCheck.value) {
+                textCheck.classList.remove("is-invalid");
+                textCheck.classList.add("is-valid")
+
+            } else {
+                textCheck.classList.remove("is-valid");
+                textCheck.classList.add("is-invalid")
+            }
+        });
+
+    </script>
+{% endblock botton %}
